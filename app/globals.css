@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0d0d12;
+  --bg-elevated: #14141c;
+  --border: #1f1f2a;
+  --text: #e6e1cf;
+  --muted: #565f89;
+  --orange: #ff9e64;
+  --green: #9ece6a;
+  --blue: #7dcfff;
+  --purple: #bb9af7;
+  --red: #f7768e;
+  --yellow: #e0af68;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-orange: var(--orange);
+  --color-green: var(--green);
+  --color-blue: var(--blue);
+  --color-purple: var(--purple);
+  --color-red: var(--red);
+  --color-yellow: var(--yellow);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+/* Scanline overlay */
+.scanlines::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+/* CRT vignette */
+.crt-vignette::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 49;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+/* Blink animation for cursor */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scanlines::after,
+  .crt-vignette::before {
+    display: none;
+  }
+
+  .animate-blink {
+    animation: none;
+    opacity: 1;
+  }
+}
