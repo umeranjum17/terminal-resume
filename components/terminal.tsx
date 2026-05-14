@@ -114,6 +114,7 @@ export default function Terminal() {
             newLines.push({ id: lineId++, type: "spacer", content: "" });
           }
           setLines((prev) => [...prev, ...newLines]);
+          setTypingText(""); // clear ghost typing line
         }
         if (cancelled) return;
 
