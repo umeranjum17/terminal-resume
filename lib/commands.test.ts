@@ -34,4 +34,15 @@ describe("executeCommand", () => {
     expect(result).not.toBeNull();
     expect(result).toContain("os");
   });
+
+  it("includes experience data", () => {
+    const result = executeCommand("experience");
+    expect(result).toContain(profile.experience[0].company);
+  });
+
+  it("includes resume links", () => {
+    const result = executeCommand("resume");
+    expect(result).toContain("/resume");
+    expect(result).toContain("download");
+  });
 });

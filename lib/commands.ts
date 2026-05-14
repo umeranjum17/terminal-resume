@@ -26,7 +26,11 @@ function link(url: string, label: string, color = "text-blue") {
   return `<a href="${safeHref(url)}" class="${color} terminal-link" target="_blank" rel="noopener noreferrer">${h(label)}</a>`;
 }
 
-export const AUTO_COMMANDS = ["whoami", "neofetch", "stack", "contact"] as const;
+function internalLink(url: string, label: string, color = "text-blue") {
+  return `<a href="${safeHref(url)}" class="${color} terminal-link">${h(label)}</a>`;
+}
+
+export const AUTO_COMMANDS = ["whoami", "neofetch", "experience", "stack", "resume"] as const;
 
 export const QUICK_COMMANDS = [] as const;
 
@@ -58,12 +62,22 @@ const commandMap: Record<string, CommandHandler> = {
 </div>`;
   },
 
+  experience: profile.experience
+    .map(
+      (job) =>
+        `<span class="text-blue glow-blue font-semibold">${h(job.company)}</span>  <span class="text-text-dim">${h(job.title)}</span>  <span class="text-muted">${h(job.dates)}</span>`
+    )
+    .join("\n"),
+
   stack: `${Object.entries(profile.skills)
     .map(
       ([group, entries]) =>
         `<span class="text-orange w-28 inline-block shrink-0">${h(group.toLowerCase())}</span><span class="text-text-dim">${h(entries.join(" · "))}</span>`
     )
     .join("\n")}`,
+
+  resume: `<span class="text-orange w-20 inline-block shrink-0">resume</span> ${internalLink("/resume", "view full resume →", "text-blue")}
+<span class="text-orange w-20 inline-block shrink-0">download</span> ${internalLink("/resume?download=true", "download pdf →", "text-blue")}`,
 
   contact: `<span class="text-orange w-16 inline-block shrink-0">email</span>  ${link("mailto:" + profile.email, profile.email, "text-blue")}
 <span class="text-orange w-16 inline-block shrink-0">web</span>    ${link(profile.websiteUrl, profile.website, "text-blue")}
