@@ -122,15 +122,7 @@ export default function Terminal() {
         if (cancelled) return;
       }
 
-      // End of cycle: pause, then clear and restart
-      await sleep(2000);
-      if (cancelled) return;
-
-      setLines([]);
-      await sleep(600);
-      if (cancelled) return;
-
-      hasStarted.current = false;
+      // End of cycle: stop the loop, keep resume on screen
     };
 
     function typeCommand(cmd: string): Promise<void> {
