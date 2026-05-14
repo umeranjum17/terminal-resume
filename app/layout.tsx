@@ -3,7 +3,7 @@ import { defaultLocale, profile } from "@/content/profile";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: "#0a0a0a",
 };
 
 export const metadata: Metadata = {
@@ -39,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang={defaultLocale} dir={profile.direction} className="h-full">
-      <body className="h-full font-mono antialiased overflow-hidden">{children}</body>
+      <body className="h-full font-mono antialiased">{children}</body>
     </html>
   );
 }

@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { executeCommand } from "@/lib/commands";
+import { profile } from "@/content/profile";
 
 describe("executeCommand", () => {
   it("returns output for known commands", () => {
-    const result = executeCommand("help");
-    expect(result).toContain("commands:");
+    const result = executeCommand("whoami");
+    expect(result).toContain(profile.name.toLowerCase());
   });
 
   it("returns null for clear", () => {
@@ -28,9 +29,9 @@ describe("executeCommand", () => {
     expect(result).toContain('rel="noopener noreferrer"');
   });
 
-  it("handles aliases", () => {
-    const exp = executeCommand("exp");
-    const experience = executeCommand("experience");
-    expect(exp).toBe(experience);
+  it("handles function-based commands", () => {
+    const result = executeCommand("neofetch");
+    expect(result).not.toBeNull();
+    expect(result).toContain("os");
   });
 });
