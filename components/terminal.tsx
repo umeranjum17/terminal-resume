@@ -113,15 +113,17 @@ export default function Terminal() {
         }
         if (cancelled) return;
 
-        await sleep(3500);
+        // Let user read, then clear before next command
+        await sleep(3000);
+        if (cancelled) return;
+
+        setLines([]);
+        await sleep(500);
         if (cancelled) return;
       }
 
-      await sleep(2500);
-      if (cancelled) return;
-
-      setLines([]);
-      await sleep(800);
+      // End of cycle: brief pause, then restart
+      await sleep(1200);
       if (cancelled) return;
 
       hasStarted.current = false;
