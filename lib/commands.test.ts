@@ -29,10 +29,10 @@ describe("executeCommand", () => {
     expect(result).toContain('rel="noopener noreferrer"');
   });
 
-  it("handles function-based commands", () => {
-    const result = executeCommand("neofetch");
-    expect(result).not.toBeNull();
-    expect(result).toContain("os");
+  it("includes stack data", () => {
+    const result = executeCommand("stack");
+    expect(result).toContain("languages");
+    expect(result).toContain("TypeScript");
   });
 
   it("includes experience data", () => {
