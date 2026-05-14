@@ -1,191 +1,192 @@
-export const BOOT_LINES = [
-  "[ <span class='text-green'>OK</span> ] Reached target Local File Systems.",
-  "[ <span class='text-green'>OK</span> ] Started Load Kernel Modules.",
-  "[ <span class='text-green'>OK</span> ] Mounting /home/umer/projects/...",
-  "[ <span class='text-green'>OK</span> ] Starting reconciliation.service ...",
-  "[ <span class='text-green'>OK</span> ] Reached target Multi-User System.",
-  "[ <span class='text-green'>OK</span> ] Started indie-hacker.timer (caffeine-driven).",
-];
+import { copy, profile } from "@/content/profile";
 
-export const ASCII_BANNER = `<span class="text-orange"> _   _ __  __ _____ ____
-| | | |  \\/  | ____|  _ \\
-| | | | |\\/| |  _| | |_) |
-| |_| | |  | | |___|  _ <
- \\___/|_|  |_|_____|_| \\_\\</span>
+function h(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
 
-<span class="text-muted">senior software engineer · payments infrastructure · dubai</span>
-<span class="text-border">─────────────────────────────────────────────────────</span>
-<span class="text-muted">type</span> <span class="text-green">help</span> <span class="text-muted">to see available commands</span>`;
+function safeHref(value: string) {
+  if (value.startsWith("/") && !value.startsWith("//")) return h(value);
+
+  try {
+    const url = new URL(value);
+    if (url.protocol === "http:" || url.protocol === "https:" || url.protocol === "mailto:") {
+      return h(url.toString());
+    }
+  } catch {
+    return "#";
+  }
+
+  return "#";
+}
+
+function externalLink(url: string, label: string, className = "text-blue underline") {
+  return `<a href="${safeHref(url)}" class="${className}" target="_blank" rel="noopener noreferrer">${h(label)}</a>`;
+}
+
+function internalLink(
+  url: string,
+  label: string,
+  className = "text-blue underline hover:text-orange"
+) {
+  return `<a href="${safeHref(url)}" class="${className}">${h(label)}</a>`;
+}
+
+const textColorMap = {
+  orange: "text-orange",
+  green: "text-green",
+  blue: "text-blue",
+  purple: "text-purple",
+  yellow: "text-yellow",
+} as const;
+
+function skillBar(level: number) {
+  const filled = Math.round(level / 5);
+  return `${"█".repeat(filled)}${"░".repeat(Math.max(0, 20 - filled))}`;
+}
+
+export const BOOT_LINES = copy.terminal.bootLines.map(
+  (line) => `[ <span class='text-green'>OK</span> ] ${h(line)}`
+);
+
+export const ASCII_BANNER = `<span class="text-orange glow-orange font-bold text-lg">${h(profile.name.toLowerCase())}</span> <span class="text-muted">·</span> <span class="text-text">${h(profile.role.toLowerCase())}</span> <span class="text-muted">·</span> <span class="text-blue glow-blue">${h(profile.focus.toLowerCase())}</span> <span class="text-muted">·</span> <span class="text-text">${h(profile.location.toLowerCase())}</span>`;
+
+export const AUTO_COMMANDS = ["about", "experience", "projects", "stack", "contact"] as const;
+
+export const QUICK_COMMANDS = ["neofetch", "highlights", "resume", "social", "help"] as const;
 
 export type CommandResult = string | null;
 type CommandHandler = string | (() => CommandResult);
 
 const commandMap: Record<string, CommandHandler> = {
-  help: `<span class="text-yellow">available commands:</span>
+  help: `<span class="text-yellow">${h(copy.terminal.commandsLabel)}</span>  ${[
+    "about",
+    "highlights",
+    "experience",
+    "projects",
+    "stack",
+    "skills",
+    "resume",
+    "contact",
+    "social",
+    "neofetch",
+  ]
+    .map((cmd) => `<span class="text-green cursor-pointer" data-cmd="${h(cmd)}">${h(cmd)}</span>`)
+    .join(" · ")}
+<span class="text-muted">${h(copy.terminal.utilsLabel)}</span>     <span class="text-muted">whoami · clear · ls · pwd · date</span>
+<span class="text-muted">${h(copy.terminal.tipsLabel)}</span>      <span class="text-muted">${h(copy.terminal.tips)}</span>`,
 
-  <span class="text-green">about</span>       <span class="text-muted">—</span> who i am and what i do
-  <span class="text-green">experience</span>  <span class="text-muted">—</span> work history <span class="text-muted">(alias: exp)</span>
-  <span class="text-green">projects</span>    <span class="text-muted">—</span> things i've built
-  <span class="text-green">skills</span>      <span class="text-muted">—</span> tech stack <span class="text-muted">(alias: stack)</span>
-  <span class="text-green">resume</span>      <span class="text-muted">—</span> view or download resume
-  <span class="text-green">contact</span>     <span class="text-muted">—</span> how to reach me
-  <span class="text-green">social</span>      <span class="text-muted">—</span> links to profiles
-  <span class="text-green">neofetch</span>    <span class="text-muted">—</span> system info
-  <span class="text-green">whoami</span>      <span class="text-muted">—</span> username
-  <span class="text-green">clear</span>       <span class="text-muted">—</span> clear terminal
-  <span class="text-green">ls</span>          <span class="text-muted">—</span> list directory
-  <span class="text-green">pwd</span>         <span class="text-muted">—</span> print working directory
-  <span class="text-green">date</span>        <span class="text-muted">—</span> current date/time`,
+  whoami: `<span class="text-orange glow-orange">${h(profile.name.toLowerCase())}</span> — ${h(profile.role.toLowerCase())}, ${h(profile.focus.toLowerCase())}, ${h(profile.location.toLowerCase())}.`,
 
-  whoami: `<span class="text-orange">umer</span> — senior software engineer, fintech / payments infrastructure, based in dubai.`,
+  about: `<span class="text-orange glow-orange">${h(profile.role.toLowerCase())}</span> at <span class="text-blue glow-blue">${h(profile.currentCompany.toLowerCase())}</span> — ${h(profile.currentTeam.toLowerCase())} team.
 
-  about: `<span class="text-yellow">┌─ about ─────────────────────────────────────────────┐</span>
+${h(profile.headline)}
+${h(profile.summary)}
 
-  i'm a <span class="text-orange">senior software engineer</span> focused on
-  <span class="text-blue">payments infrastructure</span> in the fintech space.
+previously: ${profile.experience
+    .slice(1)
+    .map((job) => `<span class="text-blue glow-blue">${h(job.company.toLowerCase())}</span>`)
+    .join(" · ")}
 
-  by day i design ledgers, reconciliation engines,
-  and event-driven systems that move money across
-  african corridors — <span class="text-green">ZAR</span>, <span class="text-green">NGN</span>, <span class="text-green">ZMW</span>, <span class="text-green">KES</span>.
+by night: ${profile.projects.map((project) => `<span class="text-purple glow-purple">${h(project.name.toLowerCase())}</span>`).join(" · ")}
 
-  by night i build indie products: an AI model
-  aggregator (<span class="text-purple">cognifi</span>), a modular AI workstation
-  (<span class="text-purple">lumina</span>), and a multi-agent dev orchestration
-  tool (<span class="text-purple">flux</span>).
+i believe in ${profile.terminal.beliefs.map((belief) => `<span class="text-orange glow-orange">${h(belief)}</span>`).join(", ")}
+and ${h(profile.terminal.closingLine)}
+based in <span class="text-blue glow-blue">${h(profile.location.toLowerCase())}</span>`,
 
-  i believe in <span class="text-orange">double-entry bookkeeping</span>,
-  <span class="text-orange">hexagonal architecture</span>, and shipping
-  things that work over things that impress.
+  highlights: `<span class="text-orange glow-orange">${h(copy.resume.highlights.toUpperCase())}</span>
 
-  currently based in <span class="text-blue">dubai</span> 🇦🇪
+${profile.highlights.map((highlight) => `<span class="text-muted">▸</span> ${h(highlight)}`).join("\n\n")}`,
 
-<span class="text-yellow">└─────────────────────────────────────────────────────┘</span>`,
+  experience: `<span class="text-orange glow-orange">${h(copy.resume.experience.toUpperCase())}</span>
 
-  experience: `<span class="text-yellow">── work experience ──────────────────────────────────</span>
+${profile.experience
+  .map(
+    (
+      job
+    ) => `<span class="text-blue glow-blue">${h(job.company)}</span>          <span class="text-orange">${h(job.title)}</span>     <span class="text-muted">${h(job.dates)}</span>
+<span class="text-muted">  ${h(job.terminalSummary)}</span>`
+  )
+  .join("\n\n")}
 
-<span class="text-orange">SENIOR SOFTWARE ENGINEER</span> · <span class="text-blue">[Current Company]</span>
-<span class="text-muted">dubai · payments infrastructure · 20XX – present</span>
+<span class="text-muted">${h(copy.terminal.typeResume)}</span>`,
 
-  <span class="text-muted">▸</span> Designed hexagonal-architecture ledger service on
-    Modern Treasury — clean provider abstraction,
-    transactional outbox + CDC, CQRS read models.
-  <span class="text-muted">▸</span> Built payment reconciliation engine with multi-
-    dimensional charge flow (FULL_RECON / MATCH_ONLY /
-    CLEAR_ONLY / NONE) and Adjustment entity pattern.
-  <span class="text-muted">▸</span> Drove cross-system fee variance analysis between
-    v1 and v2 payment systems in BigQuery.
-  <span class="text-muted">▸</span> Owns payments state machine across ZAR / NGN /
-    ZMW / KES corridors.
+  projects: `<span class="text-orange glow-orange">${h(copy.resume.selectedProjects.toUpperCase())}</span>
 
-  <span class="text-muted">stack:</span> <span class="text-green">TypeScript · PostgreSQL · MongoDB · Redpanda
-         Kafka · SNS/SQS · BigQuery · Modern Treasury</span>
+${profile.projects.map((project) => `<span class="text-orange glow-orange">${h(project.name.toUpperCase())}</span>   <span class="text-muted">${h(project.webDescription)}</span>${project.link ? `\n<span class="text-green">${h(project.link)}</span>` : ""}`).join("\n\n")}`,
 
-<span class="text-orange">SOFTWARE ENGINEER</span> · <span class="text-blue">[Prior Roles]</span>
-<span class="text-muted">~7 years full-stack · MERN · Next.js · React Native</span>
+  stack: `<span class="text-orange glow-orange">${h(copy.resume.technicalStack.toUpperCase())}</span>
 
-  <span class="text-muted">▸</span> Shipped production web and mobile across fintech
-    and consumer products.
-  <span class="text-muted">▸</span> Enough greenfield projects to know when not to
-    start one.`,
+${Object.entries(profile.skills)
+  .map(
+    ([group, entries]) =>
+      `<span class="text-yellow">${h(group.toLowerCase())}</span>  <span class="text-text">${h(entries.join(" · "))}</span>`
+  )
+  .join("\n")}`,
 
-  projects: `<span class="text-yellow">── projects ─────────────────────────────────────────</span>
+  skills: profile.terminal.skillBars
+    .map((skill) => {
+      const color = textColorMap[skill.color];
+      return `<span class="${color}">${h(skill.name)}</span> <span class="text-green">${skillBar(skill.level)}</span> ${skill.level}%`;
+    })
+    .join("\n"),
 
-<span class="text-orange">COGNIFI</span> — <span class="text-muted">credit-based AI model aggregator</span>
-  One bill, 10+ LLM providers, model switching
-  mid-conversation. Live with paying users.
-  Currently solving retention.
-  <span class="text-muted">stack:</span> <span class="text-green">Next.js · TypeScript · Stripe · LLM SDKs</span>
+  resume: `<span class="text-blue">→</span> ${internalLink("/resume", copy.terminal.viewFullResume)}  <span class="text-blue">→</span> ${internalLink("/resume?download=true", copy.terminal.downloadPdfLower)}`,
 
-<span class="text-orange">LUMINA POWERHOUSE</span> — <span class="text-muted">modular AI workstation</span>
-  A real cockpit, not a chat box. 10+ providers,
-  RAG memory, 900+ plugins. Notable LinkedIn
-  engagement for the niche.
-  <span class="text-muted">stack:</span> <span class="text-green">Next.js · TypeScript · vector store · plugin SDK</span>
+  contact: `<span class="text-orange">${h(copy.terminal.email)}</span>     <span class="text-blue glow-blue">${h(profile.email)}</span>
+<span class="text-orange">${h(copy.terminal.web)}</span>       ${externalLink(profile.websiteUrl, profile.website)}
+<span class="text-orange">${h(copy.terminal.github)}</span>    ${externalLink(profile.githubUrl, profile.github)}
+<span class="text-orange">${h(copy.terminal.linkedin)}</span>  ${externalLink(profile.linkedinUrl, profile.linkedin)}
+<span class="text-muted">${h(copy.terminal.fastestContact)}</span>`,
 
-<span class="text-orange">FLUX</span> — <span class="text-muted">multi-agent dev orchestration</span>
-  Spawning specialised Claude Code instances and
-  coordinating them on real work. Still cooking.
-  <span class="text-muted">stack:</span> <span class="text-green">TypeScript · Claude Code · agent protocols</span>`,
-
-  skills: `<span class="text-yellow">── tech stack ───────────────────────────────────────</span>
-
-  <span class="text-orange">TypeScript</span>    <span class="text-green">████████████████████</span><span class="text-muted">░░</span>  95%
-  <span class="text-orange">Node.js</span>       <span class="text-green">███████████████████</span><span class="text-muted">░░░</span>  90%
-  <span class="text-orange">React/Next</span>    <span class="text-green">███████████████████</span><span class="text-muted">░░░</span>  90%
-  <span class="text-orange">PostgreSQL</span>    <span class="text-green">██████████████████</span><span class="text-muted">░░░░</span>  85%
-  <span class="text-orange">MongoDB</span>       <span class="text-green">█████████████████</span><span class="text-muted">░░░░░</span>  80%
-  <span class="text-orange">Kafka/Redpanda</span><span class="text-green">████████████████</span><span class="text-muted">░░░░░░</span>  75%
-  <span class="text-orange">AWS</span>           <span class="text-green">████████████████</span><span class="text-muted">░░░░░░</span>  75%
-  <span class="text-orange">Docker</span>        <span class="text-green">███████████████</span><span class="text-muted">░░░░░░░</span>  70%
-  <span class="text-orange">Python</span>        <span class="text-green">██████████████</span><span class="text-muted">░░░░░░░░</span>  65%
-  <span class="text-orange">Go</span>            <span class="text-green">████████████</span><span class="text-muted">░░░░░░░░░░</span>  55%`,
-
-  resume: `<span class="text-yellow">── resume ───────────────────────────────────────────</span>
-
-  <span class="text-blue">→</span> <a href="/resume" class="text-blue underline hover:text-orange">view full resume</a> <span class="text-muted">(opens /resume route)</span>
-  <span class="text-blue">→</span> <a href="/resume.pdf" class="text-blue underline hover:text-orange" download>download PDF</a> <span class="text-muted">(resume.pdf)</span>`,
-
-  contact: `<span class="text-yellow">── contact ──────────────────────────────────────────</span>
-
-  <span class="text-orange">email</span>     <span class="text-blue">[email protected]</span>
-  <span class="text-orange">calendar</span>  <span class="text-blue">cal.com/[handle]</span>
-  <span class="text-orange">signal</span>    <span class="text-muted">on request</span>
-
-  <span class="text-muted">fastest reply: email with a one-line subject.</span>
-  <span class="text-muted">slowest: LinkedIn DM.</span>`,
-
-  social: `<span class="text-yellow">── social ───────────────────────────────────────────</span>
-
-  <span class="text-orange">github</span>    <a href="https://github.com/[handle]" class="text-blue underline" target="_blank">github.com/[handle]</a>
-  <span class="text-orange">x</span>         <a href="https://x.com/[handle]" class="text-blue underline" target="_blank">x.com/[handle]</a> <span class="text-muted">← the honest one</span>
-  <span class="text-orange">linkedin</span>  <a href="https://linkedin.com/in/[handle]" class="text-blue underline" target="_blank">linkedin.com/in/[handle]</a> <span class="text-muted">← the corporate one</span>
-  <span class="text-orange">read.cv</span>   <a href="https://read.cv/[handle]" class="text-blue underline" target="_blank">read.cv/[handle]</a>`,
+  social: `<span class="text-orange">${h(copy.terminal.github)}</span>    ${externalLink(profile.githubUrl, profile.github)}
+<span class="text-orange">${h(copy.terminal.linkedin)}</span>  ${externalLink(profile.linkedinUrl, profile.linkedin)}
+<span class="text-orange">${h(copy.terminal.web)}</span>       ${externalLink(profile.websiteUrl, profile.website)}`,
 
   neofetch: () => {
-    return `<div class="flex flex-col md:flex-row gap-4 md:gap-8">
-<pre class="text-blue">                   -\`
-                  .o+\`
-                 \`ooo/
-                \`+oooo:
-               \`+oooooo:
-               -+oooooo+:
-             \`/:-:++oooo+:
-            \`/++++/+++++++:
-           \`/++++++++++++++:
-          \`/+++ooooooooooooo/\`
-         ./ooosssso++osssssso+\`
-        .oossssso-\`\`\`\`/ossssss+\`
-       -osssssso.      :ssssssso.
-      :osssssss/        osssso+++.
-     /ossssssss/        +ssssooo/-
-   \`/ossssso+/:-        -:/+osssso+-
-  \`+sso+:-\`                 \`.-/+oso:
- \`++:.                           \`-/+/
- .\`                                 \`</pre>
+    return `<div class="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm">
+<pre class="text-blue leading-none text-xs hidden sm:block">       /\\
+       /  \\
+      /\\   \\
+     /  ..  \\
+    /  '  '  \\
+   / ..'  '.. \\
+  /_____/\\_____\\</pre>
 <div class="flex flex-col gap-0.5">
-  <span><span class="text-orange font-bold">umer</span><span class="text-muted">@</span><span class="text-orange font-bold">dubai</span></span>
-  <span class="text-muted">──────────────────</span>
-  <span><span class="text-orange">OS</span>: Arch Linux x86_64</span>
-  <span><span class="text-orange">Host</span>: MacBook Pro 16"</span>
-  <span><span class="text-orange">Kernel</span>: 6.6.x-zen</span>
-  <span><span class="text-orange">Shell</span>: zsh 5.9</span>
-  <span><span class="text-orange">DE</span>: Hyprland</span>
-  <span><span class="text-orange">Terminal</span>: kitty</span>
-  <span><span class="text-orange">Editor</span>: neovim + claude code</span>
-  <span><span class="text-orange">Lang</span>: TypeScript, Go, Python</span>
-  <span><span class="text-orange">Uptime</span>: ~7 years in tech</span>
-  <span><span class="text-orange">Focus</span>: payments infra</span>
-  <span></span>
-  <span><span class="inline-block w-3 h-3 bg-red rounded-sm"></span> <span class="inline-block w-3 h-3 bg-orange rounded-sm"></span> <span class="inline-block w-3 h-3 bg-yellow rounded-sm"></span> <span class="inline-block w-3 h-3 bg-green rounded-sm"></span> <span class="inline-block w-3 h-3 bg-blue rounded-sm"></span> <span class="inline-block w-3 h-3 bg-purple rounded-sm"></span></span>
+<span><span class="text-orange font-bold glow-orange">${h(profile.name.split(" ")[0].toLowerCase())}</span><span class="text-muted">@</span><span class="text-orange font-bold glow-orange">${h(profile.location.toLowerCase())}</span></span>
+<span class="text-muted">──────────────</span>
+<span><span class="text-orange">${h(copy.terminal.os)}</span> ${h(profile.terminal.os)}</span>
+<span><span class="text-orange">${h(copy.terminal.editor)}</span> ${h(profile.terminal.editor)}</span>
+<span><span class="text-orange">${h(copy.terminal.languages)}</span> ${h(profile.skills.Languages.join(", "))}</span>
+<span><span class="text-orange">${h(copy.terminal.focus)}</span> ${h(profile.focus.toLowerCase())} @ ${h(profile.currentCompany)}</span>
+<span><span class="text-orange">${h(copy.terminal.events)}</span> ${h(profile.terminal.events)}</span>
+<span><span class="text-orange">${h(copy.terminal.side)}</span> ${h(profile.projects.map((project) => project.name.toLowerCase()).join(" · "))}</span>
+<span><span class="text-orange">${h(copy.terminal.beyond)}</span> ${h(profile.terminal.neofetchBeyond)}</span>
+<span><span class="inline-block w-2.5 h-2.5 bg-red rounded-sm"></span> <span class="inline-block w-2.5 h-2.5 bg-orange rounded-sm"></span> <span class="inline-block w-2.5 h-2.5 bg-yellow rounded-sm"></span> <span class="inline-block w-2.5 h-2.5 bg-green rounded-sm"></span> <span class="inline-block w-2.5 h-2.5 bg-blue rounded-sm"></span> <span class="inline-block w-2.5 h-2.5 bg-purple rounded-sm"></span></span>
 </div>
 </div>`;
   },
 
   clear: () => null,
 
-  ls: `<span class="text-blue">about.txt</span>  <span class="text-green">projects/</span>  <span class="text-blue">resume.pdf</span>  <span class="text-green">skills/</span>  <span class="text-purple">.config/</span>  <span class="text-muted">.env</span>`,
+  ls: profile.terminal.files
+    .map((file) => {
+      const color = file.endsWith("/")
+        ? "text-green"
+        : file.startsWith(".")
+          ? "text-purple"
+          : file.endsWith(".pdf")
+            ? "text-blue"
+            : "text-blue";
+      return `<span class="${color}">${h(file)}</span>`;
+    })
+    .join("  "),
 
-  pwd: `<span class="text-blue">/home/umer/portfolio</span>`,
+  pwd: `<span class="text-blue">${h(profile.terminal.path)}</span>`,
 
   date: () => {
     const now = new Date();
@@ -195,43 +196,28 @@ const commandMap: Record<string, CommandHandler> = {
 
 // Aliases
 commandMap.exp = commandMap.experience;
-commandMap.stack = commandMap.skills;
+commandMap.hl = commandMap.highlights;
 
-export const COMMAND_NAMES = Object.keys(commandMap).filter(
-  (k) => !["exp", "stack"].includes(k)
-);
+export const COMMAND_NAMES = Object.keys(commandMap).filter((k) => !["exp", "hl"].includes(k));
 
 export function executeCommand(input: string): CommandResult {
   const trimmed = input.trim().toLowerCase();
 
-  // Check easter eggs first
   const egg = easterEggs[trimmed];
   if (egg !== undefined) return egg;
 
   const handler = commandMap[trimmed];
   if (handler === undefined) {
-    return `<span class="text-red">command not found: ${trimmed}</span>. type <span class="text-green">help</span> for available commands.`;
+    return `<span class="text-red">${h(copy.terminal.commandNotFound)}: ${h(trimmed)}</span>. <span class="text-green">${h(copy.terminal.availableCommandsHint)}</span>`;
   }
 
   if (typeof handler === "function") return handler();
   return handler;
 }
 
-const easterEggs: Record<string, string> = {
-  sudo: `<span class="text-red">umer is not in the sudoers file. this incident will be reported.</span>`,
-  "sudo rm -rf /": `<span class="text-red">nice try. not today.</span>`,
-  "rm -rf /": `<span class="text-red">permission denied. also, why?</span>`,
-  "rm -rf /*": `<span class="text-red">i'm not that kind of terminal.</span>`,
-  ":q": `<span class="text-muted">this isn't vim. but i respect the muscle memory.</span>`,
-  ":wq": `<span class="text-muted">saved. just kidding — there's nothing to save.</span>`,
-  "cd ..": `<span class="text-muted">you're already home.</span>`,
-  hello: `<span class="text-green">hey there! 👋 type <span class="text-orange">help</span> to get started.</span>`,
-  hi: `<span class="text-green">hi! 👋 type <span class="text-orange">help</span> to get started.</span>`,
-  "hire me": `<span class="text-green">bold move. i like it. check <span class="text-orange">contact</span> and let's talk.</span>`,
-  pakistan: `<span class="text-green">🇵🇰 zindabad!</span>`,
-  "arch btw": `<span class="text-blue">i use arch btw. (yes, unironically.)</span>`,
-  vim: `<span class="text-muted">neovim, actually. with lazy.nvim. fight me.</span>`,
-  exit: `<span class="text-muted">there is no escape. you live here now.</span>`,
-  matrix: `<span class="text-green">wake up, Neo... the payments have you.</span>`,
-  coffee: `<span class="text-yellow">☕ brewing... done. black, no sugar. like my terminals.</span>`,
-};
+const easterEggs: Record<string, string> = Object.fromEntries(
+  Object.entries(profile.terminal.easterEggs).map(([command, response]) => [
+    command,
+    `<span class="text-muted">${h(response)}</span>`,
+  ])
+);

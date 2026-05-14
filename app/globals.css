@@ -12,6 +12,8 @@
   --purple: #bb9af7;
   --red: #f7768e;
   --yellow: #e0af68;
+  --font-mono-stack:
+    "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 @theme inline {
@@ -26,13 +28,22 @@
   --color-purple: var(--purple);
   --color-red: var(--red);
   --color-yellow: var(--yellow);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-mono: var(--font-mono-stack);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-mono);
+}
+
+::selection {
+  background: rgba(255, 158, 100, 0.25);
+  color: var(--text);
 }
 
 /* Scanline overlay */
@@ -58,17 +69,19 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 49;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 50%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
 }
 
 /* Blink animation for cursor */
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .animate-blink {
@@ -93,6 +106,293 @@ body {
   background: var(--muted);
 }
 
+/* Line entrance animation */
+@keyframes fadeInLine {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.line-enter {
+  animation: fadeInLine 0.25s ease forwards;
+}
+
+/* Glow effects */
+.glow-orange {
+  text-shadow: 0 0 8px rgba(255, 158, 100, 0.4);
+}
+.glow-green {
+  text-shadow: 0 0 8px rgba(158, 206, 106, 0.4);
+}
+.glow-blue {
+  text-shadow: 0 0 8px rgba(125, 207, 255, 0.4);
+}
+.glow-purple {
+  text-shadow: 0 0 8px rgba(187, 154, 247, 0.4);
+}
+
+/* CTA pulse glow */
+@keyframes ctaPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(255, 158, 100, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 158, 100, 0.6);
+  }
+}
+
+.cta-glow {
+  animation: ctaPulse 2s ease-in-out infinite;
+}
+
+/* CTA border glow */
+@keyframes borderGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(255, 158, 100, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(255, 158, 100, 0.4);
+  }
+}
+
+.cta-border-glow {
+  animation: borderGlow 2s ease-in-out infinite;
+}
+
+/* Print styles for resume page */
+@media print {
+  @page {
+    size: A4;
+    margin: 0.38in 0.48in;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+    line-height: 1.4;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .scanlines::after,
+  .crt-vignette::before {
+    display: none !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ATS RESUME PRINT STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.ats-resume {
+  display: none;
+}
+
+@media print {
+  .ats-resume {
+    display: block !important;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1a1a1a;
+    background: white;
+    font-size: 8.8pt;
+    line-height: 1.22;
+  }
+
+  .ats-resume * {
+    color: #1a1a1a !important;
+    background: transparent !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .ats-header {
+    text-align: center;
+    border-bottom: 1.4pt solid #1a1a1a;
+    padding-bottom: 5pt;
+    margin-bottom: 7pt;
+  }
+
+  .ats-name {
+    font-size: 17pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0 0 2pt 0;
+    text-transform: uppercase;
+  }
+
+  .ats-title {
+    font-size: 9.6pt;
+    font-weight: 600;
+    margin: 0 0 3pt 0;
+    color: #444 !important;
+  }
+
+  .ats-contact {
+    font-size: 8.2pt;
+    color: #555 !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 5pt;
+  }
+
+  .ats-contact span {
+    color: #555 !important;
+  }
+
+  .ats-section {
+    margin-bottom: 6pt;
+    break-inside: avoid;
+  }
+
+  .ats-section-title {
+    font-size: 8.8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 0.8pt solid #1a1a1a;
+    padding-bottom: 1.5pt;
+    margin-bottom: 4pt;
+    margin-top: 0;
+  }
+
+  .ats-profile {
+    font-size: 8.8pt;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .ats-job {
+    margin-bottom: 5pt;
+    break-inside: avoid;
+  }
+
+  .ats-job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2pt 12pt;
+  }
+
+  .ats-job-title {
+    font-size: 9pt;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .ats-job-date {
+    font-size: 8.2pt;
+    color: #555 !important;
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .ats-job-company {
+    font-size: 8.2pt;
+    color: #444 !important;
+    margin: 0.5pt 0 2pt 0;
+    font-style: italic;
+  }
+
+  .ats-list {
+    margin: 1.5pt 0 2pt 0;
+    padding-left: 11pt;
+    list-style-type: disc;
+  }
+
+  .ats-list li {
+    margin-bottom: 1pt;
+    font-size: 8.5pt;
+    line-height: 1.2;
+  }
+
+  .ats-tech {
+    font-size: 8pt;
+    color: #555 !important;
+    font-style: italic;
+    margin-top: 3pt;
+  }
+
+  .ats-project {
+    margin-bottom: 3pt;
+  }
+
+  .ats-project-name {
+    font-size: 8.8pt;
+    font-weight: 700;
+    margin: 0 0 1pt 0;
+  }
+
+  .ats-project-desc {
+    font-size: 8.5pt;
+    margin: 0 0 1pt 0;
+    line-height: 1.2;
+  }
+
+  .ats-project-line {
+    font-size: 8.5pt;
+    line-height: 1.2;
+    margin: 0 0 2pt 0;
+  }
+
+  .ats-skills-grid p {
+    margin: 1.2pt 0;
+    font-size: 8.4pt;
+    line-height: 1.18;
+  }
+
+  .ats-skills-grid strong {
+    font-weight: 700;
+  }
+
+  .ats-edu {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2pt 12pt;
+  }
+
+  .ats-edu-degree {
+    font-size: 8.8pt;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .ats-edu-school {
+    font-size: 8.2pt;
+    color: #444 !important;
+    margin: 1pt 0 0 0;
+    font-style: italic;
+  }
+
+  .ats-edu-date {
+    font-size: 8.2pt;
+    color: #555 !important;
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .web-resume {
+    display: none !important;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .scanlines::after,
@@ -103,5 +403,20 @@ body {
   .animate-blink {
     animation: none;
     opacity: 1;
+  }
+
+  .line-enter {
+    animation: none;
+    opacity: 1;
+  }
+  .glow-orange,
+  .glow-green,
+  .glow-blue,
+  .glow-purple {
+    text-shadow: none;
+  }
+  .cta-glow,
+  .cta-border-glow {
+    animation: none;
   }
 }
