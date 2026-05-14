@@ -8,7 +8,7 @@ import { AUTO_COMMANDS, executeCommand } from "@/lib/commands";
 
 interface LineItem {
   id: number;
-  type: "input" | "output";
+  type: "input" | "output" | "spacer";
   content: string;
 }
 
@@ -101,29 +101,32 @@ export default function Terminal() {
 
         const result = executeCommand(cmd);
         if (result !== null) {
-          setLines((prev) => [
-            ...prev,
+          const newLines: LineItem[] = [
             { id: lineId++, type: "input", content: cmd },
             ...result.split("\n").map((line) => ({
               id: lineId++,
               type: "output" as const,
               content: line,
             })),
-          ]);
+          ];
+          // Add spacer between commands (not after last one)
+          if (i < AUTO_COMMANDS.length - 1) {
+            newLines.push({ id: lineId++, type: "spacer", content: "" });
+          }
+          setLines((prev) => [...prev, ...newLines]);
         }
         if (cancelled) return;
 
-        // Let user read, then clear before next command
-        await sleep(3000);
-        if (cancelled) return;
-
-        setLines([]);
-        await sleep(500);
+        await sleep(2500);
         if (cancelled) return;
       }
 
-      // End of cycle: brief pause, then restart
-      await sleep(1200);
+      // End of cycle: pause, then clear and restart
+      await sleep(2000);
+      if (cancelled) return;
+
+      setLines([]);
+      await sleep(600);
       if (cancelled) return;
 
       hasStarted.current = false;
@@ -194,6 +197,8 @@ export default function Terminal() {
           {lines.map((line) =>
             line.type === "input" ? (
               <PromptLine key={line.id} text={line.content} cursor={false} />
+            ) : line.type === "spacer" ? (
+              <div key={line.id} className="h-6" />
             ) : (
               <OutputLine key={line.id} content={line.content} />
             )
