@@ -26,7 +26,7 @@ Examples of unacceptable behavior:
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainer at **umeranjum17@gmail.com**. All complaints will be reviewed and investigated promptly and fairly. The maintainer is obligated to respect the privacy and security of the reporter.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported privately via [GitHub private reporting](https://github.com/umeranjum17/terminal-resume/security/advisories/new). All complaints will be reviewed and investigated promptly and fairly. The maintainer is obligated to respect the privacy and security of the reporter.
 
 Project maintainers have the right and responsibility to remove, edit, or reject contributions that are not aligned with this Code of Conduct.
 
