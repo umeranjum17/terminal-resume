@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in this project, please report it privately by emailing **umeranjum17@gmail.com**.
+If you discover a security vulnerability in this project, please report it privately via [GitHub private vulnerability reporting](https://github.com/umeranjum17/terminal-resume/security/advisories/new).
 
 Please do **not** open a public issue until the vulnerability has been addressed and a fix is available.
 

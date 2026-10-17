@@ -201,7 +201,7 @@ const englishProfile = {
     closingLine: "shipping things that work over things that impress.",
     neofetchBeyond: "double-entry bookkeeping enjoyer",
     files: ["about.txt", "projects/", "resume.pdf", "skills/", ".config/", ".env"],
-    path: "/home/umer/portfolio",
+    path: "~/portfolio",
     easterEggs: {
       sudo: "user is not in the sudoers file. this incident will be reported.",
       "sudo rm -rf /": "nice try. not today.",
