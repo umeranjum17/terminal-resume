@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/umeranjum17/terminal-resume/actions/workflows/ci.yml/badge.svg)](https://github.com/umeranjum17/terminal-resume/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![X](https://img.shields.io/badge/X-@umership-black)](https://x.com/umership)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/umeranjum17/terminal-resume)
 
 An open-source terminal-style portfolio and one-page resume built with Next.js 16, Tailwind CSS v4, and Framer Motion.
